@@ -9,6 +9,10 @@
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "discover": "tsx src/index.ts discover",
+    "save-session": "tsx src/index.ts save-session",
+    "discover:session": "tsx src/index.ts discover --session",
+    "run-videos": "tsx src/index.ts run-videos",
+    "run-videos:session": "tsx src/index.ts run-videos --session",
     "check": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

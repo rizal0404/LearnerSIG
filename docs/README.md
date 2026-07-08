@@ -7,8 +7,9 @@ LearnerSIG adalah aplikasi pendamping simulasi pembelajaran korporasi. MVP tahap
 - Gunakan hanya pada portal, akun, dan course yang memiliki izin eksplisit untuk simulasi, QA, audit, atau otomasi internal.
 - MVP tahap 1 tidak menjawab pre-test atau post-test secara otomatis.
 - Kredensial disimpan di `.env` lokal dan tidak masuk ke Git.
+- Session browser disimpan di `.auth/session.json` dan tidak masuk ke Git.
 
-## Cara Menjalankan
+## Cara Menjalankan Discovery Normal
 
 1. Salin `.env.example` menjadi `.env`.
 2. Isi `PORTAL_URL`, `PORTAL_USERNAME`, `PORTAL_PASSWORD`, dan `COURSE_URL`.
@@ -16,22 +17,57 @@ LearnerSIG adalah aplikasi pendamping simulasi pembelajaran korporasi. MVP tahap
 4. Jalankan discovery dengan `npm run discover`.
 5. Lihat output di path `DISCOVERY_OUTPUT`, default `reports/course-discovery.json`.
 
-## Konfigurasi Loading Portal
+## Cara Menjalankan Dengan Session Tersimpan
 
-Portal dapat loading lama setelah login. Gunakan variabel berikut jika perlu:
+Gunakan mode ini jika portal lambat, login perlu stabilisasi, atau ingin menghindari login ulang setiap run.
 
-- `LOGIN_SUCCESS_URL=/erp` untuk menandai redirect login berhasil.
-- `LOGIN_TIMEOUT_MS=120000` untuk timeout login 120 detik.
-- `PAGE_LOAD_TIMEOUT_MS=120000` untuk timeout navigasi halaman 120 detik.
+1. Jalankan `npm run save-session`.
+2. Browser headed akan terbuka dan login menggunakan kredensial `.env`.
+3. Setelah login sukses, session tersimpan ke `SESSION_STATE_PATH`, default `.auth/session.json`.
+4. Jalankan discovery berikutnya dengan `npm run discover:session`.
+
+Jika session expired, jalankan ulang `npm run save-session`.
+
+## Konfigurasi `.env`
+
+- `PORTAL_URL`: URL halaman login portal.
+- `PORTAL_USERNAME`: username portal.
+- `PORTAL_PASSWORD`: password portal.
+- `COURSE_URL`: URL course target.
+- `HEADLESS`: `true` atau `false` untuk discovery normal.
+- `SLOW_MO_MS`: delay Playwright per aksi.
+- `MAX_TEST_MINUTES`: batas waktu pre/post-test untuk tahap berikutnya.
+- `DISCOVERY_OUTPUT`: path output JSON discovery.
+- `SESSION_STATE_PATH`: path file session Playwright.
+- `LOGIN_SUCCESS_URL`: penanda URL login berhasil, default `/erp`.
+- `LOGIN_TIMEOUT_MS`: timeout login, default `120000`.
+- `PAGE_LOAD_TIMEOUT_MS`: timeout navigasi halaman, default `120000`.
 
 Jika `PORTAL_PASSWORD` mengandung karakter `#`, bungkus nilainya dengan quote di `.env`, contoh `PORTAL_PASSWORD="abc#123"`.
 
 ## Batas MVP Tahap 1
 
 - Login menggunakan selector generik username/password/submit.
-- Discovery daftar konten menggunakan selector generik.
-- Output mencakup judul course, jumlah item, jenis item, dan progress jika persentase terbaca dari teks halaman.
+- Discovery daftar konten menggunakan selector generik dan parser teks halaman.
+- Output mencakup judul course, jumlah item, jenis item, dan progress jika persentase terbaca.
 - Jika portal memakai UI khusus, selector perlu disesuaikan di `src/portal/selectors.ts`.
+
+## Troubleshooting
+
+### Discovery kembali ke halaman login
+
+- Pastikan `.env` benar dan password dengan `#` sudah di-quote.
+- Jika memakai session, jalankan ulang `npm run save-session`.
+- Cek debug di `screenshots/course-discovery-failure.*`.
+
+### Portal loading lama
+
+- Naikkan `LOGIN_TIMEOUT_MS` dan `PAGE_LOAD_TIMEOUT_MS`.
+- Gunakan `npm run discover:session` setelah session disimpan.
+
+### Item course tidak terbaca
+
+Jika login berhasil tetapi item course tetap 0, sesuaikan selector di `src/portal/selectors.ts` atau parser di `src/portal/course.ts`.
 
 ## Roadmap
 
@@ -39,19 +75,3 @@ Jika `PORTAL_PASSWORD` mengandung karakter `#`, bungkus nilainya dengan quote di
 - Tahap 3: screenshot bukti progres dan laporan sesi.
 - Tahap 4: ekstraksi transkrip video dari subtitle/audio.
 - Tahap 5: timer assisted mode untuk pre-test dan post-test.
-
-## Troubleshooting
-
-### Discovery kembali ke halaman login
-
-Jika 
-pm run discover gagal dengan pesan browser masih berada di halaman login:
-
-- Pastikan PORTAL_USERNAME dan PORTAL_PASSWORD benar.
-- Pastikan akun dapat login melalui form username/password, bukan hanya SSO Office 365.
-- Jika portal wajib SSO, MVP perlu ditambah mode login SSO atau storage session manual.
-- Cek screenshot screenshots/course-discovery-failure.png untuk melihat halaman terakhir.
-
-### Item course tidak terbaca
-
-Jika login berhasil tetapi item course tetap 0, sesuaikan selector di src/portal/selectors.ts.

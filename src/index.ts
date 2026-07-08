@@ -2,18 +2,39 @@ import { mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { loadConfig } from './config/env.js';
 import { createBrowserSession } from './browser/session.js';
+import { saveSessionState } from './browser/session-store.js';
 import { loginToPortal } from './browser/login.js';
 import { discoverCourse } from './portal/course.js';
 import { writeJsonReport } from './storage/reports.js';
 
 const command = process.argv[2] ?? 'discover';
+const useSession = process.argv.includes('--session');
 
-async function runDiscover(): Promise<void> {
+async function runSaveSession(): Promise<void> {
   const config = loadConfig();
-  const session = await createBrowserSession(config);
+  const session = await createBrowserSession(config, { storeSession: true });
 
   try {
     await loginToPortal(session.page, config);
+    await saveSessionState(session.context, config);
+    console.log(`Session tersimpan: ${config.sessionStatePath}`);
+    console.log('Browser akan ditutup dalam 5 detik. Jangan tutup tab.');
+    await new Promise((resolve) => setTimeout(resolve, 5_000));
+  } finally {
+    await session.context.close();
+    await session.browser.close();
+  }
+}
+
+async function runDiscover(): Promise<void> {
+  const config = loadConfig();
+  const session = await createBrowserSession(config, { useSavedSession: useSession });
+
+  try {
+    if (!useSession) {
+      await loginToPortal(session.page, config);
+    }
+
     const discovery = await discoverCourse(session.page, config);
     await mkdir(dirname(config.discoveryOutput), { recursive: true });
     await writeJsonReport(config.discoveryOutput, discovery);
@@ -25,11 +46,17 @@ async function runDiscover(): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  if (command !== 'discover') {
-    throw new Error(`Command tidak dikenal: ${command}. Gunakan: discover`);
+  if (command === 'save-session') {
+    await runSaveSession();
+    return;
   }
 
-  await runDiscover();
+  if (command === 'discover') {
+    await runDiscover();
+    return;
+  }
+
+  throw new Error(`Command tidak dikenal: ${command}. Gunakan: save-session, discover [--session]`);
 }
 
 main().catch((error) => {

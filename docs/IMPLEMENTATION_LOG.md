@@ -31,3 +31,7 @@ pm run discover berhasil menghasilkan eports/course-discovery.json.
 - Discovery course tidak lagi bergantung pada `networkidle` yang sering tertahan request background.
 - Parser course dirapikan agar output item unik: pre-test, video berurutan, dan post-test.
 - Validasi `npm run discover` berhasil membaca 4 item course Leaders Cafe.
+## 2026-07-08 - Save-session load-session
+- Menambahkan command save-session dan discover --session.
+- Menyimpan Playwright storageState ke .auth/session.json secara default.
+- Discovery bisa dijalankan ulang tanpa login manual selama session masih valid.

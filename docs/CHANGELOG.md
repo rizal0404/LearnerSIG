@@ -4,17 +4,20 @@ Semua perubahan penting dicatat di file ini agar implementasi, perubahan, dan pe
 
 Format mengikuti gaya Keep a Changelog sederhana.
 
-## [0.1.0] - 2026-07-08
+## [0.1.1] - 2026-07-08
+
+### Added
+
+- Perintah `npm run save-session` untuk menyimpan state browser Playwright ke `.auth/session.json`.
+- Perintah `npm run discover:session` untuk discovery pakai session tersimpan.
+- Opsi config `SESSION_STATE_PATH` di `.env.example`.
+- Helper `src/browser/session-store.ts` untuk menyimpan storageState.
 
 ### Changed
 
-- Login automation menunggu `LOGIN_SUCCESS_URL` dengan timeout yang dapat dikonfigurasi.
-- Discovery course menggunakan parser item unik dari teks halaman untuk mengurangi duplikasi selector.
-- Dokumentasi `.env` menjelaskan password dengan karakter `#` harus di-quote.
+- Browser session menggunakan launch mode khusus saat menyimpan session manual.
 
-- File scaffold dinormalisasi ke UTF-8 tanpa BOM untuk kompatibilitas 	sx.
-- Selector login diperluas untuk field login pada portal SIG.
-- Login failure sekarang menghasilkan screenshot debug di screenshots/login-failure.png.
+## [0.1.0] - 2026-07-08
 
 ### Added
 
