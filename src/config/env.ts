@@ -11,6 +11,9 @@ const envSchema = z.object({
   MAX_TEST_MINUTES: z.coerce.number().int().positive().default(10),
   MAX_VIDEO_MINUTES: z.coerce.number().int().positive().default(60),
   DISCOVERY_OUTPUT: z.string().min(1).default('reports/course-discovery.json'),
+  VIDEO_RUN_OUTPUT: z.string().min(1).default('reports/video-run.json'),
+  PROGRESS_EVIDENCE_DIR: z.string().min(1).default('screenshots/progress-evidence'),
+  TRANSCRIPT_OUTPUT_DIR: z.string().min(1).default('reports/transcripts'),
   SESSION_STATE_PATH: z.string().min(1).default('.auth/session.json'),
   LOGIN_SUCCESS_URL: z.string().min(1).default('/erp'),
   LOGIN_TIMEOUT_MS: z.coerce.number().int().positive().default(120_000),
@@ -27,6 +30,9 @@ export type AppConfig = {
   maxTestMinutes: number;
   maxVideoMinutes: number;
   discoveryOutput: string;
+  videoRunOutput: string;
+  progressEvidenceDir: string;
+  transcriptOutputDir: string;
   sessionStatePath: string;
   loginSuccessUrl: string;
   loginTimeoutMs: number;
@@ -51,6 +57,9 @@ export function loadConfig(): AppConfig {
     maxTestMinutes: parsed.data.MAX_TEST_MINUTES,
     maxVideoMinutes: parsed.data.MAX_VIDEO_MINUTES,
     discoveryOutput: parsed.data.DISCOVERY_OUTPUT,
+    videoRunOutput: parsed.data.VIDEO_RUN_OUTPUT,
+    progressEvidenceDir: parsed.data.PROGRESS_EVIDENCE_DIR,
+    transcriptOutputDir: parsed.data.TRANSCRIPT_OUTPUT_DIR,
     sessionStatePath: parsed.data.SESSION_STATE_PATH,
     loginSuccessUrl: parsed.data.LOGIN_SUCCESS_URL,
     loginTimeoutMs: parsed.data.LOGIN_TIMEOUT_MS,

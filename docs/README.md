@@ -28,6 +28,23 @@ Gunakan mode ini jika portal lambat, login perlu stabilisasi, atau ingin menghin
 
 Jika session expired, jalankan ulang `npm run save-session`.
 
+
+
+## Cara Menjalankan Video Berurutan
+
+Tahap 2 menjalankan semua item video secara berurutan berdasarkan hasil discovery halaman course sampai progress terbaca `100%`.
+Tahap 3 menambahkan rekam progress sesi dan screenshot bukti penyelesaian otomatis.
+Tahap 4 mengekstrak transkrip jika video menyediakan subtitle, caption, atau transcript text di halaman.
+
+1. Pastikan discovery sudah bisa membaca item video dengan `npm run discover:session`.
+2. Jalankan `npm run run-videos:session` untuk memakai session tersimpan, atau `npm run run-videos` untuk login ulang.
+3. Runner akan membuka video sesuai urutan, memutar elemen `<video>`, lalu kembali ke halaman course untuk polling progress.
+4. Lihat laporan di `VIDEO_RUN_OUTPUT`, default `reports/video-run.json`.
+5. Lihat screenshot bukti progress di `PROGRESS_EVIDENCE_DIR`, default `screenshots/progress-evidence`.
+6. Lihat transkrip video di `TRANSCRIPT_OUTPUT_DIR`, default `reports/transcripts`.
+
+Jika video panjang, naikkan `MAX_VIDEO_MINUTES` di `.env`.
+
 ## Konfigurasi `.env`
 
 - `PORTAL_URL`: URL halaman login portal.
@@ -37,7 +54,11 @@ Jika session expired, jalankan ulang `npm run save-session`.
 - `HEADLESS`: `true` atau `false` untuk discovery normal.
 - `SLOW_MO_MS`: delay Playwright per aksi.
 - `MAX_TEST_MINUTES`: batas waktu pre/post-test untuk tahap berikutnya.
+- `MAX_VIDEO_MINUTES`: batas waktu maksimal per video, default `60` menit.
 - `DISCOVERY_OUTPUT`: path output JSON discovery.
+- `VIDEO_RUN_OUTPUT`: path output JSON hasil runner video.
+- `PROGRESS_EVIDENCE_DIR`: folder screenshot dan teks bukti progress Tahap 3, default `screenshots/progress-evidence`.
+- `TRANSCRIPT_OUTPUT_DIR`: folder output transkrip Tahap 4, default `reports/transcripts`.
 - `SESSION_STATE_PATH`: path file session Playwright.
 - `LOGIN_SUCCESS_URL`: penanda URL login berhasil, default `/erp`.
 - `LOGIN_TIMEOUT_MS`: timeout login, default `120000`.
@@ -71,7 +92,7 @@ Jika login berhasil tetapi item course tetap 0, sesuaikan selector di `src/porta
 
 ## Roadmap
 
-- Tahap 2: validasi urutan materi dan watcher progress video sampai 100%.
-- Tahap 3: screenshot bukti progres dan laporan sesi.
-- Tahap 4: ekstraksi transkrip video dari subtitle/audio.
+- Tahap 2: validasi urutan materi dan watcher progress video sampai 100%. (implemented)
+- Tahap 3: screenshot bukti progres dan laporan sesi. (implemented)
+- Tahap 4: ekstraksi transkrip video dari subtitle/caption/transcript text. (implemented)
 - Tahap 5: timer assisted mode untuk pre-test dan post-test.

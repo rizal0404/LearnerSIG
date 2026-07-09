@@ -5,6 +5,7 @@ import { createBrowserSession } from './browser/session.js';
 import { saveSessionState } from './browser/session-store.js';
 import { loginToPortal } from './browser/login.js';
 import { discoverCourse } from './portal/course.js';
+import { runCourseVideos } from './portal/video-runner.js';
 import { writeJsonReport } from './storage/reports.js';
 
 const command = process.argv[2] ?? 'discover';
@@ -45,6 +46,24 @@ async function runDiscover(): Promise<void> {
   }
 }
 
+async function runVideos(): Promise<void> {
+  const config = loadConfig();
+  const session = await createBrowserSession(config, { useSavedSession: useSession });
+
+  try {
+    if (!useSession) {
+      await loginToPortal(session.page, config);
+    }
+
+    const report = await runCourseVideos(session.page, config);
+    await mkdir(dirname(config.videoRunOutput), { recursive: true });
+    await writeJsonReport(config.videoRunOutput, report);
+    console.log(`Video run selesai: ${config.videoRunOutput}`);
+  } finally {
+    await session.context.close();
+    await session.browser.close();
+  }
+}
 async function main(): Promise<void> {
   if (command === 'save-session') {
     await runSaveSession();
@@ -56,7 +75,12 @@ async function main(): Promise<void> {
     return;
   }
 
-  throw new Error(`Command tidak dikenal: ${command}. Gunakan: save-session, discover [--session]`);
+  if (command === 'run-videos') {
+    await runVideos();
+    return;
+  }
+
+  throw new Error(`Command tidak dikenal: ${command}. Gunakan: save-session, discover [--session], run-videos [--session]`);
 }
 
 main().catch((error) => {

@@ -35,3 +35,24 @@ pm run discover berhasil menghasilkan eports/course-discovery.json.
 - Menambahkan command save-session dan discover --session.
 - Menyimpan Playwright storageState ke .auth/session.json secara default.
 - Discovery bisa dijalankan ulang tanpa login manual selama session masih valid.
+
+## 2026-07-08 - MVP Tahap 2 Video Runner
+
+- Menambahkan command `run-videos` dan `run-videos --session`.
+- Menambahkan runner untuk menjalankan item video berurutan berdasarkan index discovery.
+- Runner memutar video yang ditemukan di halaman utama atau iframe, lalu polling progress course sampai `100%`.
+- Menambahkan laporan `VIDEO_RUN_OUTPUT` dan timeout `MAX_VIDEO_MINUTES`.
+
+## 2026-07-09 - MVP Tahap 3 Progress Evidence
+
+- Menambahkan helper screenshot bukti progress dengan output PNG dan body text.
+- Laporan video run sekarang menyimpan snapshot progress awal dan akhir course.
+- Setiap video yang selesai atau sudah `100%` mendapat evidence path di laporan JSON.
+- Menambahkan konfigurasi `PROGRESS_EVIDENCE_DIR` untuk folder bukti penyelesaian.
+
+## 2026-07-09 - MVP Tahap 4 Video Transcript
+
+- Menambahkan extractor transkrip dari text track aktif, file subtitle `<track src>`, dan elemen transcript/caption yang terlihat.
+- Runner video menyimpan transkrip sebelum video diputar atau saat video yang sudah selesai dibuka ulang.
+- Menambahkan output teks per video di `TRANSCRIPT_OUTPUT_DIR` dan metadata transkrip ke laporan video run.
+- Jika subtitle tidak tersedia, laporan tetap mencatat status transkrip `not-found` tanpa menggagalkan sesi.
